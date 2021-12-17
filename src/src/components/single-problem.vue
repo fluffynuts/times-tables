@@ -1,22 +1,22 @@
 <template>
-    <table class="problem-container">
-      <tr>
-        <td></td>
-        <td>{{ problem.left }}</td>
-      </tr>
-      <tr>
-        <td>x</td>
-        <td>{{ problem.right }}</td>
-      </tr>
-      <tr>
-        <td colspan="2">
-          <input type="number"
-                 :class="{ }"
-                 v-model="problem.answer"
-                 @keyup="onKeyDown">
-        </td>
-      </tr>
-    </table>
+  <table class="problem-container">
+    <tr>
+      <td></td>
+      <td>{{ problem?.left }}</td>
+    </tr>
+    <tr>
+      <td>x</td>
+      <td>{{ problem?.right }}</td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <input type="number"
+               :class="{ answered, correct }"
+               v-model="answer"
+               @keyup="onKeyDown">
+      </td>
+    </tr>
+  </table>
 </template>
 
 <style lang="scss">
@@ -34,7 +34,9 @@ table.problem-container {
       &:nth-child(2) {
         min-width: 1em;
       }
+
       text-align: right;
+
       input[type="number"] {
         -moz-appearance: textfield;
         font-size: xx-large;
@@ -44,7 +46,20 @@ table.problem-container {
         border-radius: 5px;
         border: 1px solid #555;
         text-align: right;
+
+        &:focus {
+          outline: none;
+        }
+
+        &.answered {
+          border-color: red;
+
+          &.correct {
+            border-color: green;
+          }
+        }
       }
+
       /* Chrome, Safari, Edge, Opera */
       input::-webkit-outer-spin-button,
       input::-webkit-inner-spin-button {
@@ -59,7 +74,7 @@ table.problem-container {
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { IProblem } from "./problem-grid.vue";
+import { IProblem, Nullable } from "./problem-grid.vue";
 
 export default defineComponent({
   props: {
@@ -68,16 +83,21 @@ export default defineComponent({
       default: undefined
     },
   },
-  setup(props, { emit }) {
+  data() {
+    return {
+      answered: false,
+      correct: false,
+      answer: null as Nullable<number>
+    }
   },
   methods: {
-    onKeyDown(ev: KeyboardEvent) {
-      console.log({
-        left: this.problem?.left,
-        right: this.problem?.right,
-        answer: this.problem?.answer,
-        answerType: typeof(this.problem?.answer)
-      });
+    onKeyDown() {
+      this.answered = !!this.problem?.answer;
+      this.correct = this.problem?.answer === this.problem?.solution;
+      if (this.problem) {
+        this.problem.answer = this.answer;
+      }
+      this.$emit("problem-changed", this.problem);
     }
   }
 });

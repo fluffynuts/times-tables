@@ -1,3 +1,18 @@
+<template>
+  <div>
+    <confetti-explosion
+        v-if="allCompleted"
+        style="margin: auto" :stageHeight="winHeight"></confetti-explosion>
+    <span v-for="(item, index) in problems">
+      <single-problem
+          :problem="item"
+          @problem-changed="onProblemChanged"
+      ></single-problem>
+      <br v-if="(1+index) % columns === 0"/>
+    </span>
+  </div>
+</template>
+
 <script lang="ts">
 import { defineComponent } from "vue";
 import SingleProblem from "./single-problem.vue";
@@ -16,7 +31,7 @@ function randInt(min: number, max: number): number {
   return parseInt(floaty.toFixed(0));
 }
 
-type Nullable<T> = T | null;
+export type Nullable<T> = T | null;
 
 export default defineComponent({
   components: { SingleProblem },
@@ -26,7 +41,9 @@ export default defineComponent({
       rows: 4,
       minOperand: 2,
       maxOperand: 12,
-      problems: [] as IProblem[]
+      problems: [] as IProblem[],
+      allCompleted: false,
+      winHeight: window.innerHeight
     }
   },
   methods: {
@@ -48,6 +65,11 @@ export default defineComponent({
       }
       console.error("Unable to generate unique problem within 100 iterations");
       return null;
+    },
+    onProblemChanged(problem: IProblem) {
+      this.allCompleted = this.problems.reduce((acc: boolean, cur: IProblem) => {
+        return acc && cur.answer === cur.solution;
+      }, true);
     }
   },
   setup() {
@@ -66,11 +88,3 @@ export default defineComponent({
 });
 </script>
 
-<template>
-  <span v-for="(item, index) in problems">
-    <single-problem
-        :problem="item"
-    ></single-problem>
-    <br v-if="(1+index) % columns === 0" />
-  </span>
-</template>

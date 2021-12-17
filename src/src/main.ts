@@ -1,4 +1,7 @@
-import { createApp } from 'vue'
-import App from './App.vue'
+import { createApp } from "vue"
+import App from "./App.vue"
+import ConfettiExplosion from "vue-confetti-explosion";
 
-createApp(App).mount('#app')
+const app = createApp(App);
+app.use(ConfettiExplosion);
+app.mount("#app");
