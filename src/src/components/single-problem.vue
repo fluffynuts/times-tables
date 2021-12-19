@@ -12,8 +12,7 @@
       <td colspan="2">
         <input type="number"
                :class="{ answered, correct }"
-               v-model="answer"
-               @keyup="onKeyDown">
+               v-model="answer"/>
       </td>
     </tr>
   </table>
@@ -80,8 +79,19 @@ export default defineComponent({
   props: {
     problem: {
       type: Object as () => IProblem,
-      default: undefined
+      default: null
     },
+  },
+  watch: {
+    answer (newValue: number) {
+      this.answered = !!`${this.answer}`.length
+      if (!this.problem) {
+        return;
+      }
+      this.problem.answer = newValue;
+      this.correct = this.problem.answer === this.problem.solution;
+      this.$emit("problem-changed", this.problem);
+    }
   },
   data() {
     return {
@@ -90,15 +100,5 @@ export default defineComponent({
       answer: null as Nullable<number>
     }
   },
-  methods: {
-    onKeyDown() {
-      this.answered = !!this.problem?.answer;
-      this.correct = this.problem?.answer === this.problem?.solution;
-      if (this.problem) {
-        this.problem.answer = this.answer;
-      }
-      this.$emit("problem-changed", this.problem);
-    }
-  }
 });
 </script>

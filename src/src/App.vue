@@ -3,7 +3,6 @@ import ProblemGrid from "./components/problem-grid.vue";
 </script>
 
 <template>
-  <h3>Times Tables!</h3>
   <problem-grid></problem-grid>
 </template>
 
